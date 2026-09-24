@@ -22,9 +22,9 @@ Per thermostat (labeled `device_id`, `name`):
 | `mysa_device_temperature_celsius` | ambient temperature (calibration-corrected when available) |
 | `mysa_device_setpoint_celsius` | target temperature |
 | `mysa_device_humidity_percent` | relative humidity, 0-100 |
-| `mysa_device_current_amps` | instantaneous current draw |
+| `mysa_device_current_amps` | load current as reported by the device. On real baseboards it stays non-zero while the heater is idle, so read it as the heater's connected load, not a live draw |
 | `mysa_device_voltage_volts` | live voltage measurement, or nominal if unavailable |
-| `mysa_device_power_watts` | estimated as voltage × current — **not** a direct measurement |
+| `mysa_device_power_watts` | estimated average power: voltage × current × heating duty cycle — **not** a direct measurement; absent if the device reports no duty cycle |
 | `mysa_device_duty_cycle_ratio` | fraction of time the heating relay has been on, 0-1 |
 | `mysa_device_heating_active` | 1 if duty cycle is currently above 0 |
 | `mysa_device_connected` | 1 if the device last reported itself connected |

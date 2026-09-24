@@ -41,7 +41,7 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           stage="mysa_exporter-${version}.linux-${{ matrix.arch }}"
           mkdir "$stage"
-          cp index.mjs package.json "$stage/"
+          cp ./*.mjs package.json "$stage/"
           cp -r node_modules "$stage/"
           cp -r systemd "$stage/"
           cp -r grafana "$stage/"

@@ -8,6 +8,7 @@
 import { createServer } from 'node:http';
 import { MysaApiClient, MysaApiError, UnauthenticatedError } from 'mysa-js-sdk';
 import client from '@prometheus-io/client';
+import { estimatedPowerWatts, stateAgeSeconds } from './readings.mjs';
 
 const MYSA_USERNAME = process.env.MYSA_USERNAME;
 const MYSA_PASSWORD = process.env.MYSA_PASSWORD;
@@ -76,7 +77,8 @@ const humidity = new client.Gauge({
 });
 const current = new client.Gauge({
   name: 'mysa_device_current_amps',
-  help: 'Instantaneous current draw reported by the device',
+  help: 'Load current reported by the device. Observed to stay non-zero while the heater is idle, '
+    + 'so read it as the heater\'s connected load, not a live draw -- see mysa_device_power_watts',
   labelNames: deviceLabelNames,
   registers: [registry]
 });
@@ -88,7 +90,8 @@ const voltage = new client.Gauge({
 });
 const power = new client.Gauge({
   name: 'mysa_device_power_watts',
-  help: 'Estimated power draw, computed as voltage x current (not a direct device measurement)',
+  help: 'Estimated average power: voltage x current x heating-relay duty cycle '
+    + '(not a direct device measurement; absent when the device reports no duty cycle)',
   labelNames: deviceLabelNames,
   registers: [registry]
 });
@@ -204,8 +207,9 @@ async function poll() {
       if (liveVoltage !== undefined) {
         voltage.set(labels, Number(liveVoltage));
       }
-      if (state.Current?.v !== undefined && liveVoltage !== undefined) {
-        power.set(labels, Number(state.Current.v) * Number(liveVoltage));
+      const estimatedPower = estimatedPowerWatts(state.Current?.v, liveVoltage, state.Duty?.v);
+      if (estimatedPower !== undefined) {
+        power.set(labels, estimatedPower);
       }
 
       if (state.Duty?.v !== undefined) {
@@ -219,7 +223,7 @@ async function poll() {
       }
 
       if (state.Timestamp !== undefined) {
-        stateAge.set(labels, Math.max(0, (Date.now() - state.Timestamp) / 1000));
+        stateAge.set(labels, stateAgeSeconds(state.Timestamp, Date.now()));
       }
     }
 

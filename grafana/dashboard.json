@@ -794,7 +794,7 @@
         },
         "overrides": []
       },
-      "description": "Estimated as voltage x current; not a direct measurement from the device.",
+      "description": "Estimated average power: voltage x load current x heating duty cycle; not a direct measurement from the device.",
       "options": {
         "tooltip": {
           "mode": "multi",
