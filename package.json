@@ -1,0 +1,28 @@
+{
+  "name": "mysa-exporter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prometheus exporter for Mysa smart thermostats, via mysa-js-sdk.",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/majorsilence/mysa_exporter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/majorsilence/mysa_exporter/issues"
+  },
+  "homepage": "https://github.com/majorsilence/mysa_exporter",
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "mysa-js-sdk": "3.3.5",
+    "@prometheus-io/client": "0.16.1"
+  }
+}
