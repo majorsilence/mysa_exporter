@@ -76,20 +76,67 @@ MYSA_USERNAME=you@example.com MYSA_PASSWORD=your-password node index.mjs
 (reports the process as healthy independently of whether the last poll of
 Mysa's API succeeded).
 
-### Ansible / gitops
+### Installing as a systemd service
 
-This is consumed as a pinned release by the `mysa_exporter` Ansible role in
-[majorsilence/linux-setup-scripts](https://github.com/majorsilence/linux-setup-scripts/tree/main/gitops/ansible/roles/mysa_exporter)
-— see that repo for a full systemd-hardened deployment plus a companion
-Grafana dashboard.
+Each [release](https://github.com/majorsilence/mysa_exporter/releases)
+tarball bundles the app, `node_modules` already installed for that
+architecture, a ready-to-use systemd unit, and an env file template — no
+npm registry access needed on the target machine.
+
+```bash
+# 1. Node.js >=24.15.0 must already be installed and on PATH (e.g. from
+#    https://nodejs.org/, your distro package, or nvm) -- not bundled here,
+#    since it's a shared system runtime, not part of the app.
+
+# 2. Download + verify + extract
+curl -fsSLO https://github.com/majorsilence/mysa_exporter/releases/download/v1.0.0/mysa_exporter-1.0.0.linux-amd64.tar.gz
+curl -fsSLO https://github.com/majorsilence/mysa_exporter/releases/download/v1.0.0/sha256sums.txt
+sha256sum --check --ignore-missing sha256sums.txt
+tar xzf mysa_exporter-1.0.0.linux-amd64.tar.gz
+sudo mv mysa_exporter-1.0.0.linux-amd64 /opt/mysa_exporter
+
+# 3. Create the service user
+sudo useradd --system --shell /usr/sbin/nologin --no-create-home mysa_exporter
+
+# 4. Credentials
+sudo cp /opt/mysa_exporter/systemd/mysa_exporter.env.example /etc/mysa_exporter.env
+sudo "$EDITOR" /etc/mysa_exporter.env   # fill in MYSA_USERNAME / MYSA_PASSWORD
+sudo chown root:mysa_exporter /etc/mysa_exporter.env
+sudo chmod 640 /etc/mysa_exporter.env
+
+# 5. Install + start the unit
+sudo cp /opt/mysa_exporter/systemd/mysa_exporter.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now mysa_exporter
+```
+
+`systemd/mysa_exporter.service` assumes the app lives at `/opt/mysa_exporter`
+(rename the extracted, version-named directory to that, as above) and that
+`node` resolves on `PATH` (`ExecStart=/usr/bin/env node index.mjs`) — edit
+both if your setup differs. It runs as the unprivileged `mysa_exporter`
+system user with `ProtectSystem=strict`/`NoNewPrivileges`/etc.
+
+### Grafana dashboard
+
+`grafana/dashboard.json` is a ready-made dashboard: per-thermostat current
+readings table, temperature-vs-setpoint, humidity, heating duty cycle,
+estimated power draw, and connectivity. It expects a Prometheus datasource
+with UID `prometheus` scraping this exporter under job name `mysa` — either
+rename your datasource's UID to `prometheus`, or open the dashboard's JSON
+model after importing and change the datasource references. Import it via
+Grafana's UI (Dashboards → New → Import, upload the file) or drop it into a
+provisioned dashboards directory.
 
 ## Releasing
 
 Each architecture-specific tarball
-(`mysa_exporter-<version>.linux-<amd64|arm64>.tar.gz`) bundles the app
-together with `node_modules` already installed for that architecture (built
-against the pinned Node.js version in `.github/workflows/release.yml`), so
-consumers don't need npm registry access at deploy time — just download,
+(`mysa_exporter-<version>.linux-<amd64|arm64>.tar.gz`) bundles the app,
+`node_modules` already installed for that architecture (built against the
+pinned Node.js version in `.github/workflows/release.yml`), the systemd
+unit + env template (`systemd/`), and the Grafana dashboard
+(`grafana/dashboard.json`) — everything in "Installing as a systemd
+service" and "Grafana dashboard" above comes from inside the tarball.
+Consumers don't need npm registry access at deploy time — just download,
 verify against `sha256sums.txt`, extract, and run with the matching Node.js
 version.
 

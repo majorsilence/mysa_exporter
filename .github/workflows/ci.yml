@@ -20,3 +20,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
 
       - run: npm test
+
+      - run: systemd-analyze verify systemd/mysa_exporter.service
+
+      - run: python3 -m json.tool grafana/dashboard.json > /dev/null

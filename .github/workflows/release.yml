@@ -43,6 +43,8 @@ jobs:
           mkdir "$stage"
           cp index.mjs package.json "$stage/"
           cp -r node_modules "$stage/"
+          cp -r systemd "$stage/"
+          cp -r grafana "$stage/"
           tar czf "${stage}.tar.gz" "$stage"
           sha256sum "${stage}.tar.gz" > "${stage}.tar.gz.sha256"
 

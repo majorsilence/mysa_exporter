@@ -1,0 +1,23 @@
+[Unit]
+Description=Prometheus exporter for Mysa smart thermostats
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=mysa_exporter
+Group=mysa_exporter
+WorkingDirectory=/opt/mysa_exporter
+EnvironmentFile=/etc/mysa_exporter.env
+ExecStart=/usr/bin/env node index.mjs
+
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
