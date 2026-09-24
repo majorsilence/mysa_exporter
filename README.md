@@ -89,8 +89,8 @@ npm registry access needed on the target machine.
 #    since it's a shared system runtime, not part of the app.
 
 # 2. Download + verify + extract
-curl -fsSLO https://github.com/majorsilence/mysa_exporter/releases/download/v1.0.0/mysa_exporter-1.0.0.linux-amd64.tar.gz
-curl -fsSLO https://github.com/majorsilence/mysa_exporter/releases/download/v1.0.0/sha256sums.txt
+curl -fsSLO https://github.com/majorsilence/mysa_exporter/releases/download/v1.1.0/mysa_exporter-1.1.0.linux-amd64.tar.gz
+curl -fsSLO https://github.com/majorsilence/mysa_exporter/releases/download/v1.1.0/sha256sums.txt
 sha256sum --check --ignore-missing sha256sums.txt
 tar xzf mysa_exporter-1.0.0.linux-amd64.tar.gz
 sudo mv mysa_exporter-1.0.0.linux-amd64 /opt/mysa_exporter
