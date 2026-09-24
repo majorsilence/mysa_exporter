@@ -120,7 +120,7 @@
           "fields": "",
           "values": false
         },
-        "textMode": "value_and_name",
+        "textMode": "value",
         "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "auto"
@@ -306,7 +306,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "mysa_device_temperature_celsius{name=~\"$device\"}",
+          "expr": "max by (device_id, name) (mysa_device_temperature_celsius{name=~\"$device\"})",
           "refId": "A",
           "format": "table",
           "instant": true,
@@ -317,7 +317,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "mysa_device_setpoint_celsius{name=~\"$device\"}",
+          "expr": "max by (device_id, name) (mysa_device_setpoint_celsius{name=~\"$device\"})",
           "refId": "B",
           "format": "table",
           "instant": true,
@@ -328,7 +328,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "mysa_device_humidity_percent{name=~\"$device\"}",
+          "expr": "max by (device_id, name) (mysa_device_humidity_percent{name=~\"$device\"})",
           "refId": "C",
           "format": "table",
           "instant": true,
@@ -339,7 +339,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "mysa_device_heating_active{name=~\"$device\"}",
+          "expr": "max by (device_id, name) (mysa_device_heating_active{name=~\"$device\"})",
           "refId": "D",
           "format": "table",
           "instant": true,
@@ -350,7 +350,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "mysa_device_connected{name=~\"$device\"}",
+          "expr": "max by (device_id, name) (mysa_device_connected{name=~\"$device\"})",
           "refId": "E",
           "format": "table",
           "instant": true,
@@ -361,7 +361,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "mysa_device_state_age_seconds{name=~\"$device\"}",
+          "expr": "max by (device_id, name) (mysa_device_state_age_seconds{name=~\"$device\"})",
           "refId": "F",
           "format": "table",
           "instant": true,
@@ -514,15 +514,6 @@
       },
       "transformations": [
         {
-          "id": "labelsToFields",
-          "options": {
-            "keepLabels": [
-              "device_id",
-              "name"
-            ]
-          }
-        },
-        {
           "id": "filterFieldsByName",
           "options": {
             "exclude": {
@@ -540,14 +531,23 @@
             "excludeByName": {
               "device_id": true
             },
+            "indexByName": {
+              "name": 0,
+              "Value #A": 1,
+              "Value #B": 2,
+              "Value #C": 3,
+              "Value #D": 4,
+              "Value #E": 5,
+              "Value #F": 6
+            },
             "renameByName": {
               "name": "Thermostat",
-              "mysa_device_temperature_celsius": "Temp",
-              "mysa_device_setpoint_celsius": "Setpoint",
-              "mysa_device_humidity_percent": "Humidity",
-              "mysa_device_heating_active": "Heating",
-              "mysa_device_connected": "Connected",
-              "mysa_device_state_age_seconds": "Last Seen"
+              "Value #A": "Temp",
+              "Value #B": "Setpoint",
+              "Value #C": "Humidity",
+              "Value #D": "Heating",
+              "Value #E": "Connected",
+              "Value #F": "Last Seen"
             }
           }
         }
@@ -632,13 +632,12 @@
           "sort": "desc"
         },
         "legend": {
-          "displayMode": "table",
+          "displayMode": "list",
           "placement": "bottom",
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": []
         }
-      }
+      },
+      "description": "Solid lines are actual temperature; dashed lines are each thermostat's setpoint."
     },
     {
       "id": 7,
