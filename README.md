@@ -120,7 +120,13 @@ system user with `ProtectSystem=strict`/`NoNewPrivileges`/etc.
 
 `grafana/dashboard.json` is a ready-made dashboard: per-thermostat current
 readings table, temperature-vs-setpoint, humidity, heating duty cycle,
-estimated power draw, and connectivity. It expects a Prometheus datasource
+estimated power draw, and connectivity.
+
+![Dashboard overview: status tiles, thermostats table, and temperature vs setpoint](docs/dashboard-overview.png)
+
+![Dashboard details: humidity, heating duty cycle, estimated power draw, and connectivity](docs/dashboard-details.png)
+
+It expects a Prometheus datasource
 with UID `prometheus` scraping this exporter under job name `mysa` — either
 rename your datasource's UID to `prometheus`, or open the dashboard's JSON
 model after importing and change the datasource references. Import it via
